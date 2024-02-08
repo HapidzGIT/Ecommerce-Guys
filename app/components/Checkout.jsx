@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { product } from "../libs/product";
 
 const Checkout = () => {
   const [quantity, setQuantity] = useState(1);
 
   const decreaseQuantity = () => {
-    setQuantity((prevState) => (quantity > 1 ? prevState - 1 : null));
+    setQuantity((prevState) => (prevState > 1 ? prevState - 1 : 1)); // Jika prevState < 1, maka kembalikan ke 1
   };
 
   const increaseQuantity = () => {
@@ -12,11 +13,23 @@ const Checkout = () => {
   };
 
   const checkout = async () => {
-    alert("Checkout SNAP! 🌟")
+    const data = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity: quantity,
+    };
+    const response = await fetch('/api/tokenizer', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+
+    const requestData = await response.json();
+    window.snap.pay(requestData.token)
   };
 
   const generatePaymentLink = async () => {
-    alert("Checkout Payment Link! 🔥")
+    alert("Checkout Payment Link! 🔥");
   };
 
   return (
@@ -35,7 +48,7 @@ const Checkout = () => {
             id="quantity"
             value={quantity}
             className="h-10 w-16 text-black border-transparent text-center"
-            onChange={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
           />
 
           <button
